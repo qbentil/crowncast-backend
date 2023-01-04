@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 const EventSchema = new Schema({
     name: {
         type: String,
@@ -32,8 +32,14 @@ const EventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Organizer',
     },
+    categories: {
+        type: [String],
+        default: [],
+    },
     is_deleted: {
         type: Boolean,
         default: false,
     },
 }, { timestamps: true });
+
+export default mongoose.models['Event'] || mongoose.model('Event', EventSchema);
