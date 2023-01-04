@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const CompanySchema = new Schema({
     name: {
@@ -44,4 +44,6 @@ const OrganizerSchema = new Schema({
         default: false
     }
 }, { timestamps: true });
+
+export default mongoose.models["Organizer"] || mongoose.model("Organizer", OrganizerSchema);
 
