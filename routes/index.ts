@@ -1,0 +1,1 @@
+export {default as EventRoute} from './event.route';
