@@ -33,8 +33,9 @@ const EventSchema = new Schema({
         ref: 'Organizer',
     },
     categories: {
-        type: [String],
+        type: [Schema.Types.ObjectId],
         default: [],
+        ref: 'Category'
     },
     is_deleted: {
         type: Boolean,
