@@ -1,5 +1,6 @@
 import Mail from '../mail';
 import { MailUser } from './../types';
+import jwt from "jsonwebtoken";
 
 import bcrypt from 'bcrypt';
 export const CreateError = (code: number, message: string,) => {
@@ -10,7 +11,7 @@ export const CreateError = (code: number, message: string,) => {
 }
 
 
-export const GeneratePIN:any = async (length: number = 6) => {
+export const GeneratePIN: any = async (length: number = 6) => {
     // generate random {length} digits PIN code
     let pin = "";
     for (let i = 0; i < length; i++) {
@@ -23,7 +24,7 @@ export const GeneratePIN:any = async (length: number = 6) => {
     }
 }
 
-export const BcryptPassword = async (password: string) => {
+const BcryptPassword = async (password: string) => {
     // encrypt password using bcrypt
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -38,16 +39,23 @@ export const ComparePassword = async (password: string, hashedPassword: string) 
     return await bcrypt.compare(password, hashedPassword);
 }
 
-// console.log(GeneratePIN(8, BcryptPassword));
+export const GenerateToken = (user: any, role: string) => {
+    //   Create access token
+    const accessToken = jwt.sign(
+        { id: user._id, role },
+        process.env.JWT_ACCESS_SECRET || "",
+        {
+            expiresIn: process.env.JWT_ACCESS_EXPIRATION || "1d"
+        }
+    );
+    //   Create refresh token
+    const refreshToken = jwt.sign(
+        { id: user._id, role },
+        process.env.JWT_REFRESH_SECRET || "",
+        {
+            expiresIn: process.env.JWT_REFRESH_EXPIRATION || "30d"
+        }
+    );
 
-// const User:MailUser = {
-//     name: "Shadrack Bentil",
-//     email: "bentilshadrack72@gmail.com",
-//     password: GeneratePIN(),
-//     role: "Organizer",
-//     site: "https://voting-app-frontend.herokuapp.com",
-// }
-
-// Mail.OnboardingMail(User, (info: any) => {
-//     console.log(info);
-// })
+    return { accessToken, refreshToken }
+}
