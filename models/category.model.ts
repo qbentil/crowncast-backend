@@ -9,6 +9,11 @@ const CategorySchema = new Schema({
         type: String,
         default: null
     },
+    event:{
+        type: Schema.Types.ObjectId,
+        ref: "Event",
+        required: [true, "Event is required"]
+    },
     is_deleted: {
         type: Boolean,
         default: false
