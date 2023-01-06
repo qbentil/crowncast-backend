@@ -16,6 +16,10 @@ const UserSchema = new Schema({
     phone: {
         type: String,
     },
+    token: {
+        type: String,
+        default: null
+    },
     is_deleted: {
         type: Boolean,
         default: false
