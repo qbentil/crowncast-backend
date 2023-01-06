@@ -44,8 +44,8 @@
 <br>
 
 ## :dart: About ##
+This is the backend for the Crowncast application. It is built with Node.js, Express, and MongoDB. It is a REST API that is consumed by the frontend application.
 
-Describe your project
 
 ## :sparkles: Features ##
 
