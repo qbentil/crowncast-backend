@@ -12,7 +12,7 @@ const addOrganizer = async (req: Request, res: Response, next: NextFunction) => 
         // check if organizer already exists
         const organizerExists = await Organizer.findOne({ email });
         if (organizerExists) {
-            next(CreateError(409, "Organizer already exists"));
+            return next(CreateError(409, "Organizer already exists"));
         }
 
         const { password, hashedPassword } = await GeneratePIN(8); // Generate a random 8 digit password and hash it
