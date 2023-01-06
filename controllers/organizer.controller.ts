@@ -1,7 +1,49 @@
+import { ComparePassword, GenerateToken } from './../util/index';
 import { NextFunction, Request, Response } from "express";
 import { Organizer } from "../models";
-import { BcryptPassword, CreateError, GeneratePIN } from "../util";
+import { CreateError, GeneratePIN } from "../util";
 import Mail from "../mail";
+
+// LOGIN
+const login = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, pin } = req.body;
+    try {
+        const organizer = await Organizer.findOne({ email });
+        if (!organizer) {
+            return next(CreateError(404, "Organizer not found"));
+        }
+
+        const isMatch = await ComparePassword(pin, organizer.password);
+        if (!isMatch) {
+            return next(CreateError(401, "Invalid credentials"));
+        }
+
+        // Generate token
+        const { accessToken, refreshToken } = GenerateToken(organizer, "Organizer");
+
+        // update organizer with new refresh token
+        await Organizer.findByIdAndUpdate(organizer._id, { token: refreshToken });
+
+        // create cookie
+        res.cookie("jwt", refreshToken, { httpOnly: true, sameSite: "none", maxAge: 24 * 60 * 60 * 1000, secure: true })
+
+        // remove password, is_deleted and token from organizer object
+        const { password, is_deleted, token, ...rest } = organizer._doc;
+
+        // append access token to organizer object
+        rest.accessToken = accessToken;
+
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "Login successful"
+
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
 
 // ADD ORGANIZER
 const addOrganizer = async (req: Request, res: Response, next: NextFunction) => {
@@ -81,4 +123,4 @@ const updateOrganizer = async (req: Request, res: Response, next: NextFunction) 
 
 
 // Exports 
-export { addOrganizer, getOrganizers };
+export { addOrganizer, getOrganizers, updateOrganizer, login };
