@@ -1,7 +1,17 @@
 import { Router } from "express";
-import { addOrganizer, getOrganizers } from "../controllers/organizer.controller";
+import { addOrganizer, getOrganizers, login } from "../controllers/organizer.controller";
 
 const router = Router();
+
+// LOGIN ORGANIZER
+/**
+ * @route POST /organizer/login
+ * @description Login organizer
+ * @access Public
+ * @returns {Object} Organizer as data
+ *
+ */
+router.post("/login", login);
 
 // ADD ORGANIZER
 /**
