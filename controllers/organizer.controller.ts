@@ -71,11 +71,12 @@ const addOrganizer = async (req: Request, res: Response, next: NextFunction) => 
 
         // Send onboarding email to organizer with generated password
         Mail.OnboardingMail({ name, email, password, role: "Organizer" }, (info: any) => {
-
+            // remove password, is_deleted and token from organizer object
+            const { password, is_deleted, token, ...rest } = organizer._doc;
             // Send response to client
             res.status(201).json({
                 success: true,
-                data: organizer,
+                data: rest,
                 message: "Organizer created successfully"
             });
         })
@@ -89,9 +90,14 @@ const addOrganizer = async (req: Request, res: Response, next: NextFunction) => 
 const getOrganizers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const organizers = await Organizer.find({ is_deleted: false });
+        // remove password, is_deleted and token from organizer object
+        const restData = organizers.map((organizer: any) => {
+            const { password, is_deleted, token, ...rest } = organizer._doc;
+            return rest;
+        }) as any;
         res.status(200).json({
             success: true,
-            data: organizers,
+            data: restData,
             message: "Organizers fetched successfully"
         });
     } catch (err) {
@@ -110,9 +116,12 @@ const updateOrganizer = async (req: Request, res: Response, next: NextFunction) 
             company,
             address
         }, { new: true });
+
+        // remove password, is_deleted and token from organizer object
+        const { password, is_deleted, token, ...rest } = organizer._doc;
         res.status(200).json({
             success: true,
-            data: organizer,
+            data: rest,
             message: "Organizer updated successfully"
         });
     } catch (err) {
