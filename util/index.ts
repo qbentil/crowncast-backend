@@ -59,3 +59,9 @@ export const GenerateToken = (user: any, role: string) => {
 
     return { accessToken, refreshToken }
 }
+
+export const VerifyToken = async (token: string, type:string) => {
+    // verify token
+    const secret = type === "access" ? process.env.JWT_ACCESS_SECRET : process.env.JWT_REFRESH_SECRET;
+    return await jwt.verify(token, secret || "");
+}
