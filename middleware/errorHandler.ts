@@ -1,15 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 
 
-const ErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-    const statusCode = res.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
+const ErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+    console.log("Middleware Error Handling");
+    const status = err.statusCode == 200 ? 500 : err.statusCode;
+    const message = err.message || 'Something went wrong';
     const stack = process.env.NODE_ENV === 'production' ? '🥞' : err.stack;
-    res.status(statusCode).json({
+    res.status(status).json({
         success: false,
-        statusCode,
+        status,
         message,
-        stack,
+        stack
     })
 }
 
