@@ -1,20 +1,44 @@
 import Mail from '../mail';
 import { MailUser } from './../types';
-const CreateError = (message: string, code: number) => {
+
+import bcrypt from 'bcrypt';
+export const CreateError = (code: number, message: string,) => {
     const error = new Error() as any;
     error.message = message;
     error.statusCode = code;
     return error;
 }
 
-const GeneratePIN = (length: number = 6) => {
+
+export const GeneratePIN:any = async (length: number = 6) => {
     // generate random {length} digits PIN code
     let pin = "";
     for (let i = 0; i < length; i++) {
         pin += Math.floor(Math.random() * 10);
     }
-    return pin;
+    const { password, hashedPassword } = await BcryptPassword(pin);
+    return {
+        password,
+        hashedPassword
+    }
 }
+
+export const BcryptPassword = async (password: string) => {
+    // encrypt password using bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return {
+        password,
+        hashedPassword
+    }
+}
+
+export const ComparePassword = async (password: string, hashedPassword: string) => {
+    // compare password with hashed password
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+// console.log(GeneratePIN(8, BcryptPassword));
 
 // const User:MailUser = {
 //     name: "Shadrack Bentil",
