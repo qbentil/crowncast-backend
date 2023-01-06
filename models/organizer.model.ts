@@ -11,7 +11,7 @@ const CompanySchema = new Schema({
     },
     phone: {
         type: String,
-        required: [true, "Phone is required"],
+        // required: [true, "Phone is required"],
     },
 })
 
@@ -38,6 +38,10 @@ const OrganizerSchema = new Schema({
     },
     address: {
         type: String,
+    },
+    token: {
+        type: String,
+        default: null
     },
     is_deleted: {
         type: Boolean,
