@@ -1,3 +1,4 @@
+import { VerifyAccessToken, VerifyAdmin } from './../middleware/verifications';
 import { Router } from 'express';
 import { addUser, getAllUsers, login } from '../controllers/user.controller';
 
@@ -7,9 +8,9 @@ const router = Router();
 router.post('/login', login);
 
 // ADD USER
-router.post('/', addUser);
+router.post('/', VerifyAccessToken, VerifyAdmin, addUser);
 
 // GET ALL USERS
-router.get('/', getAllUsers);
+router.get('/', VerifyAccessToken, VerifyAdmin, getAllUsers);
 
 export default router;
