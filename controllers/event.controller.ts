@@ -28,15 +28,55 @@ const addEvent = async (req: Request, res: Response, next: NextFunction) => {
 const getEvents = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const events = await Event.find({ is_deleted: false });
+
+        // get events with organizer details
+        const eventsWithOrganizer = await Event.aggregate([
+            {
+                $lookup: {
+                    from: "organizers",
+                    localField: "organizer",
+                    foreignField: "_id",
+                    as: "organizer",
+                },
+            },
+            {
+                $unwind: "$organizer",
+            },
+            {
+                $project: {
+                    name: 1,
+                    description: 1,
+                    banner: 1,
+                    vote_price: 1,
+                    opening_date: 1,
+                    closing_date: 1,
+                    organizer: {
+                        name: "$organizer.name",
+                        email: "$organizer.email",
+                        phone: "$organizer.phone",
+                        company: "$organizer.company",
+                        address: "$organizer.address",
+                    },
+                },
+            },
+        ]);
+
+            
         res.status(200).json({
             success: true,
-            data: events,
+            data: eventsWithOrganizer,
             message: "Events fetched successfully",
         });
     } catch (err) {
         next(err);
     }
 }
+
+// GET EVENT by ID
+
+// UPDATE
+
+// DELETE
 
 
 export { getEvents };
