@@ -1,5 +1,6 @@
+import { VerifyAccessToken, VerifyAdmin } from './../middleware/verifications';
 import { Router } from "express";
-import { addOrganizer, getOrganizers, login } from "../controllers/organizer.controller";
+import { addOrganizer, getOrganizer, getOrganizers, login } from "../controllers/organizer.controller";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.post("/login", login);
  * TODO: Verify Admin Token 
  */
 
-router.post("/", addOrganizer);
+router.post("/", VerifyAccessToken, VerifyAdmin, addOrganizer);
 
 // FETCH ALL ORGANIZERS
 /** 
@@ -34,7 +35,12 @@ router.post("/", addOrganizer);
  * description: Get all organizers
  * TODO:
 */
-router.get("/", getOrganizers);
+router.get("/", VerifyAccessToken, VerifyAdmin, getOrganizers);
+
+// GET ORGANIZER BY ID
+router.get("/:id",VerifyAccessToken, VerifyAdmin, getOrganizer)
+
+
 
 export default router;
 
