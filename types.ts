@@ -1,7 +1,7 @@
 export interface MailUser {
     name: string;
     email: string;
-    password: string;
+    password?: string;
     role: string;
     site?: string;
 }
