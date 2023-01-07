@@ -31,6 +31,7 @@ const EventSchema = new Schema({
     organizer: {
         type: Schema.Types.ObjectId,
         ref: 'Organizer',
+        required: [true, 'Organizer is required'],
     },
     is_deleted: {
         type: Boolean,

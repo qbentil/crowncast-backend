@@ -9,9 +9,13 @@ const ContestantSchema = new Schema({
         type: String,
         required: [true, "Image is required"],
     },
+    biography: {
+        type: String,
+        default: null,
+    },
     code: {
         type: String,
-        required: [true, "Code is required"],
+        // required: [true, "Code is required"],
     },
     votes: {
         type: Number,
@@ -20,6 +24,7 @@ const ContestantSchema = new Schema({
     event: {
         type: Schema.Types.ObjectId,
         ref: "Event",
+        required: [true, "Event is required"],
     },
     category: {
         type: String,

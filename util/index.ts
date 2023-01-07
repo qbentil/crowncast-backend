@@ -71,5 +71,26 @@ export const GenerateToken = (user: any, role: string) => {
 export const VerifyToken = async (token: string, type:string) => {
     // verify token
     const secret = type === "access" ? process.env.JWT_ACCESS_SECRET : process.env.JWT_REFRESH_SECRET;
-    return await jwt.verify(token, secret || "");
+    return  jwt.verify(token, secret || "");
+}
+
+// interface for contestant code generator
+interface IContestantCode {
+    name: string;
+    event: string;
+    category?: string;
+}
+export const GenerateContestantCode = (contestant: IContestantCode) => {
+    // generate contestant code using initials of contestant name
+    const { name, event, category } = contestant;
+    const delimiter = category ? category : event;
+
+    const initials = name.split(" ").map((word: string) => word[0]).join("").toUpperCase();
+
+    // get 3 random digits from delimiter
+    const randomDigits = delimiter.split("").map((char: string) => char.charCodeAt(0)).join("").slice(0, 3);
+
+    const contestantCode = `${initials}${randomDigits}`;
+    return contestantCode;
+    
 }
