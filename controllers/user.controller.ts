@@ -1,4 +1,4 @@
-import { ComparePassword, GenerateToken } from './../util/index';
+import { ComparePassword, GenerateToken, HashPassword } from './../util/index';
 import { NextFunction, Request, Response } from "express";
 import { CreateError, GeneratePIN } from "../util";
 import Mail from "../mail";
@@ -158,4 +158,63 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     } catch (error) {
         next(error);
     }
+}
+
+// CHANGE PASSWORD
+export const changePassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.user;
+    try {
+        const user = await User.findById(id);
+        if (!user || user.is_deleted || user.status !== "active") {
+            return next(CreateError(404, "User not found"));
+        }
+
+        const isMatch = await ComparePassword(oldPassword, user.password);
+        if (!isMatch) {
+            return next(CreateError(401, "Invalid credentials"));
+        }
+
+        const hashedPassword = await HashPassword(newPassword);
+
+        await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+        await Mail.CHANGEPASSWORDMAIL({ name: user && user.name, email: user && user.email, role: "Admin" }, (info: any) => {
+            res.status(200).json({
+                success: true,
+                message: "Password changed successfully"
+            });
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+// RESET PASSWORD
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findById(id);
+        if (!user || user.is_deleted || user.status !== "active" ) {
+            return next(CreateError(404, "User not found"));
+        }
+
+        const { password, hashedPassword } = await GeneratePIN(8); // Generate a random 8 digit password and hash it
+
+        await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+        // send email to user
+        await Mail.RESETPASSWORDMAIL({ name: user.name, email: user.email, password, role: "Admin" }, (info: any) => {
+            res.status(200).json({
+                success: true,
+                message: "Password reset successfully"
+            });
+        });
+
+    } catch (error) {
+        next(error);
+    }
+
+
 }
