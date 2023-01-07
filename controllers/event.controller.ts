@@ -27,8 +27,6 @@ const addEvent = async (req: Request, res: Response, next: NextFunction) => {
 // FETCH ALL EVENTS
 const getEvents = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const events = await Event.find({ is_deleted: false });
-
         // get events with organizer details
         const eventsWithOrganizer = await Event.aggregate([
             {
@@ -79,4 +77,4 @@ const getEvents = async (req: Request, res: Response, next: NextFunction) => {
 // DELETE
 
 
-export { getEvents };
+export { getEvents, addEvent };
