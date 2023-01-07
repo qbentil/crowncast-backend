@@ -16,6 +16,10 @@ const CompanySchema = new Schema({
 })
 
 const OrganizerSchema = new Schema({
+    avatar: {
+        type: String,
+        default: null
+    },
     name: {
         type: String,
         required: [true, "Name is required"],
@@ -46,7 +50,12 @@ const OrganizerSchema = new Schema({
     is_deleted: {
         type: Boolean,
         default: false
-    }
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active"
+    },
 }, { timestamps: true });
 
 export default mongoose.models["Organizer"] || mongoose.model("Organizer", OrganizerSchema);
