@@ -13,6 +13,11 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             return next(CreateError(404, "Organizer not found"));
         }
 
+        // check if organizer is inactive or deleted
+        if (organizer.is_deleted || !organizer.is_active) {
+            return next(CreateError(401, "Organizer account is inactive or deleted"));
+        }
+
         const isMatch = await ComparePassword(pin, organizer.password);
         if (!isMatch) {
             return next(CreateError(401, "Invalid credentials"));
@@ -105,6 +110,28 @@ const getOrganizers = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+// FETCH ORGANIZER
+const getOrganizer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const organizer = await Organizer.findById(req.params.id);
+
+        // check if organizer exists and is not deleted or inactive
+        if (!organizer || organizer.is_deleted || organizer.status === "inactive") {
+            return next(CreateError(404, "Organizer not found"));
+        }
+
+        // remove password, is_deleted and token from organizer object
+        const { password, is_deleted, token, ...rest } = organizer._doc;
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "Organizer fetched successfully"
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 // UPDATE ORGANIZER
 const updateOrganizer = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, phone, company, address } = req.body;
@@ -130,6 +157,48 @@ const updateOrganizer = async (req: Request, res: Response, next: NextFunction) 
 }
 
 
+// DELETE ORGANIZER
+const deleteOrganizer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const organizer = await Organizer.findByIdAndUpdate(req.params.id, {
+            is_deleted: true
+        }, { new: true });
+
+        // remove password, is_deleted and token from organizer object
+        const { password, is_deleted, token, ...rest } = organizer._doc;
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "Organizer deleted successfully"
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// DISABLE ORGANIZER
+const disableOrganizer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const organizer = await Organizer.findByIdAndUpdate(req.params.id, {
+            status: "inactive"
+        }, { new: true });
+
+        // remove password, is_deleted and token from organizer object
+        const { password, is_deleted, token, ...rest } = organizer._doc;
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "Organizer disabled successfully"
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+
+
+
 
 // Exports 
-export { addOrganizer, getOrganizers, updateOrganizer, login };
+export { addOrganizer, getOrganizers, updateOrganizer, login, deleteOrganizer, disableOrganizer, getOrganizer };
