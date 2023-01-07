@@ -20,6 +20,8 @@ const OnboardingMail = async (user:MailUser, callback:any) => {
   }
 };
 
+
+// For testing the mailer function 
 const SendMail = async (data:MailData, callback:any) => {
   const mailOptions = {
     from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_ID}>`,
@@ -36,8 +38,43 @@ const SendMail = async (data:MailData, callback:any) => {
   }
 }
 
+const RESETPASSWORDMAIL = async (user:MailUser, callback:any) => {
+  // add site url to user object
+  user.site = process.env.SITE_URL;
+  const mailOptions = {
+    from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_ID}>`,
+    to: user.email,
+    subject: "Reset Password on CrownCast👑",
+    text: Templates.ResetPasswordTEXT(user),
+    html: Templates.ResetPasswordHTML(user),
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    callback(info);
+  } catch (error:any) {
+    throw new Error(error);
+  }
+}
 
-const ContactMail = async (data:MailData, callback:any) => {
+const CHANGEPASSWORDMAIL = async (user:MailUser, callback:any) => {
+  // add site url to user object
+  user.site = process.env.SITE_URL;
+  const mailOptions = {
+    from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_ID}>`,
+    to: user.email,
+    subject: "Password Changed on CrownCast👑",
+    text: Templates.ChangePasswordTEXT(user),
+    html: Templates.ChangePasswordHTML(user),
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    callback(info);
+  } catch (error:any) {
+    throw new Error(error);
+  }
+}
+
+const CONTACTMAIL = async (data:MailData, callback:any) => {
   const mailOptions = {
     from: `${data.name} <${data.email}>`,
     to: process.env.EMAIL_ID,
@@ -56,8 +93,9 @@ const ContactMail = async (data:MailData, callback:any) => {
 const Mail = {
   OnboardingMail,
   SendMail,
-  CONTACTMAIL: ContactMail,
-
+  CONTACTMAIL,
+  RESETPASSWORDMAIL,
+  CHANGEPASSWORDMAIL,
 }
 
 export default Mail;
