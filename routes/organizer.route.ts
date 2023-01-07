@@ -1,6 +1,6 @@
 import { VerifyAccessToken, VerifyAdmin } from './../middleware/verifications';
 import { Router } from "express";
-import { addOrganizer, getOrganizer, getOrganizers, login } from "../controllers/organizer.controller";
+import { addOrganizer, changePassword, getOrganizer, getOrganizers, login, resetPassword } from "../controllers/organizer.controller";
 
 const router = Router();
 
@@ -39,6 +39,13 @@ router.get("/", VerifyAccessToken, VerifyAdmin, getOrganizers);
 
 // GET ORGANIZER BY ID
 router.get("/:id",VerifyAccessToken, VerifyAdmin, getOrganizer)
+
+//  CHANGE PASSWORD
+router.put("/password", VerifyAccessToken, changePassword);
+
+// RESET PASSWORD 
+router.put("/reset-password/:id", VerifyAccessToken, VerifyAdmin, resetPassword);
+
 
 
 
