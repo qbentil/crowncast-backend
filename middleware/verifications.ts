@@ -19,6 +19,10 @@ export const VerifyAccessToken = async (req: Request, res: Response, next: NextF
         }
         const decoded: any = await VerifyToken(token, "access")
 
+        if(!decoded) {
+            return next(CreateError(401, "Access denied"));
+        }
+
         // check expiration
         if (decoded.exp < Date.now().valueOf() / 1000) {
             return next(CreateError(401, "Access token has expired, please login again"));
@@ -27,7 +31,7 @@ export const VerifyAccessToken = async (req: Request, res: Response, next: NextF
         // assign user to request object
         req.user = decoded;
         next();
-    } catch (error) {
+    } catch (error : any) {
         next(error);
     }
 }
