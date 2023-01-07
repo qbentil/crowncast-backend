@@ -1,6 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
 const UserSchema = new Schema({
+    avatar: {
+        type: String,
+        default: null
+    },
     name: {
         type: String,
         required: [true, "Name is required"],
@@ -23,7 +27,13 @@ const UserSchema = new Schema({
     is_deleted: {
         type: Boolean,
         default: false
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active"
     }
+
 }, { timestamps: true });
 
 export default mongoose.models["User"] || mongoose.model("User", UserSchema);
