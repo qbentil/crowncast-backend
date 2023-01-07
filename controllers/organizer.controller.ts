@@ -1,4 +1,4 @@
-import { ComparePassword, GenerateToken } from './../util/index';
+import { ComparePassword, GenerateToken, HashPassword } from './../util/index';
 import { NextFunction, Request, Response } from "express";
 import { Organizer } from "../models";
 import { CreateError, GeneratePIN } from "../util";
@@ -195,10 +195,73 @@ const disableOrganizer = async (req: Request, res: Response, next: NextFunction)
     }
 }
 
+// CHANGE ORGANIZER PASSWORD
+const changePassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.user
+    try {
+        const organizer = await Organizer.findById(id);
+
+        // check if organizer exists and is not deleted or inactive
+        if (!organizer || organizer.is_deleted || organizer.status === "inactive") {
+            return next(CreateError(404, "Organizer not found"));
+        }
+
+        // check if old password is correct
+        const isMatch = await ComparePassword(oldPassword, organizer.password);
+        if (!isMatch) {
+            return next(CreateError(401, "Incorrect password"));
+        }
+
+        // hash new password
+        const hashedPassword = await HashPassword(newPassword);
+
+        // update organizer password
+        await Organizer.findByIdAndUpdate(id, { password: hashedPassword });
+
+        Mail.CHANGEPASSWORDMAIL({ name: organizer.name, email: organizer.email, role: "Organizer" }, (info: any) => {
+            res.status(200).json({
+                success: true,
+                message: "Password changed successfully"
+            });
+        })
+
+    } catch (err) {
+        next(err);
+    }
+}
+
+// RESET ORGANIZER PASSWORD
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+        const organizer = await Organizer.findById(id);
+                // check if organizer exists and is not deleted or inactive
+                if (!organizer || organizer.is_deleted || organizer.status === "inactive") {
+                    return next(CreateError(404, "Organizer not found"));
+                }
+        const { password, hashedPassword } = await GeneratePIN(8); // Generate a random 8 digit password and hash it
+
+        await Organizer.findByIdAndUpdate(id, { password: hashedPassword });
+
+        // send email to user
+        await Mail.RESETPASSWORDMAIL({ name: organizer.name, email: organizer.email, password, role: "Organizer" }, (info: any) => {
+            res.status(200).json({
+                success: true,
+                message: "Password reset successfully"
+            });
+        });
+
+    } catch (err) {
+        next(err);
+    }
+}
+    
+
 
 
 
 
 
 // Exports 
-export { addOrganizer, getOrganizers, updateOrganizer, login, deleteOrganizer, disableOrganizer, getOrganizer };
+export { addOrganizer, getOrganizers, updateOrganizer, login, deleteOrganizer, disableOrganizer, getOrganizer, changePassword, resetPassword };
