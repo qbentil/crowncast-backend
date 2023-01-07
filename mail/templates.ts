@@ -18,8 +18,9 @@ const Templates = {
             
         NB! This is a temporary password. Make sure to change your password after your first login for security reasons. <br/> <br/>
     
-        Login here: <a href="${site}/auth">${site}/auth</a>
+        Login here: <a href="${site}/auth">${site}/auth</a> <br/> <br/>
     
+        <small>Kindly note that this is an automated email. Please do not reply to this email.</small>
         
         Regards,<br/>
         CrownCast Team`;
@@ -32,6 +33,67 @@ const Templates = {
         <p><b>Subject:</b> ${subject}</p>
         <p><b>Message:</b> ${message}</p>
         `;
+    },
+
+    ResetPasswordTEXT: (user: MailUser) => {
+        const { name, password, role, site } = user;
+        return `Hello ${name}! 
+        You have requested to reset your password.
+        Your new password is: ${password}
+
+        NB! Quickly change your password if you did not request this change and report this to us immediately.
+
+        Login here: ${site}/auth
+
+        Regards,
+        CrownCast Team`;
+    },
+    ResetPasswordHTML: (user: MailUser) => {
+        const { name, password, role, site } = user;
+        return `
+        Hello  <i>${name}</i>! <br/>
+    
+        You have requested to reset your password. <br/>    
+        Your new password is: <b>${password}</b> <br/>
+        <br/> <br/>
+            
+        NB! Quickly change your password if you did not request this change and report this to us immediately. <br/> <br/>
+    
+        Login here: <a href="${site}/auth">${site}/auth</a>
+    
+        
+        Regards,<br/>
+        CrownCast Team`;
+    },
+    ChangePasswordTEXT: (user: MailUser) => {
+        const { name, password, role, site } = user;
+        return `Hello ${name}! 
+        You have successfully changed your password.
+        Quickly report this to us if you did not request this change.
+
+        Kindly note that this is an automated email. Please do not reply to this email.
+
+        Login here: ${site}/auth
+
+        Regards,
+        CrownCast Team`;
+    },
+    ChangePasswordHTML: (user: MailUser) => {
+        const { name, password, role, site } = user;
+        return `
+        Hello  <i>${name}</i>! <br/>
+    
+        You have successfully changed your password. <br/>    
+        Quickly report this to us if you did not request this change. <br/>
+        <br/> <br/>
+            
+        <small>Kindly note that this is an automated email. Please do not reply to this email.</small> <br/> <br/>
+    
+        Login here: <a href="${site}/auth">${site}/auth</a>
+    
+        
+        Regards,<br/>
+        CrownCast Team`;
     }
 };
 
