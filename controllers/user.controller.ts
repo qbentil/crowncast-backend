@@ -13,6 +13,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             return next(CreateError(404, "Admin not found"));
         }
 
+        // check if user is inactive or deleted
+        if (user.is_deleted || user.status !== "active") {
+            return next(CreateError(401, "Admin account is inactive or deleted"));
+        }
+
         const isMatch = await ComparePassword(pin, user.password);
         if (!isMatch) {
             return next(CreateError(401, "Invalid credentials"));
@@ -97,6 +102,59 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
             data: filteredUsers,
             message: "Users fetched successfully"
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// UPDATE USER
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { name, email, phone } = req.body;
+    const { id } = req.params;
+    try {
+        const user = await User.findByIdAndUpdate(id, {
+            name, email, phone
+        })
+
+        if (!user) {
+            return next(CreateError(404, "User not found"));
+        }
+
+        // remove password, is_deleted and token from user object
+        const { password, is_deleted, token, ...rest } = user._doc;
+
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "User updated successfully"
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+// DELETE USER
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findByIdAndUpdate(id, {
+            is_deleted: true
+        }, { new: true })
+
+        if (!user) {
+            return next(CreateError(404, "User not found"));
+        }
+
+        // remove password, is_deleted and token from user object
+        const { password, is_deleted, token, ...rest } = user._doc;
+
+        res.status(200).json({
+            success: true,
+            data: rest,
+            message: "User deleted successfully"
+        });
+
     } catch (error) {
         next(error);
     }
