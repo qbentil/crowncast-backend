@@ -85,9 +85,10 @@ const getEventById = async (
 ) => {
 	try {
 		const event = await Event.findById(req.params.id);
+		const { is_deleted, ...rest } = event;
 		res.status(200).json({
 			success: true,
-			data: event,
+			data: rest,
 		});
 	} catch (err) {
 		next(err);
@@ -105,7 +106,11 @@ const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
 			},
 			{ new: true }
 		);
-		res.status(200).json(updatedEvent);
+		const { is_deleted, ...rest } = updatedEvent;
+		res.status(200).json({
+			success: true,
+			data: rest,
+		});
 	} catch (err) {
 		next(err);
 	}
