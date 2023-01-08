@@ -95,6 +95,21 @@ const getEventById = async (
 };
 
 // UPDATE
+const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
+	const { ...updateValues } = req.body;
+	try {
+		const updatedEvent = await Event.findByIdAndUpdate(
+			req.params.id,
+			{
+				...updateValues,
+			},
+			{ new: true }
+		);
+		res.status(200).json(updatedEvent);
+	} catch (err) {
+		next(err);
+	}
+};
 
 // DELETE
 
