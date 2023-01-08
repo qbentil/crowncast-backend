@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { CreateError, GenerateContestantCode } from '../util';
 import { Contestant } from '../models';
+import mongoose from 'mongoose';
 
 // ADD CONTESTANT
 export const addContestant = async (req: Request, res: Response, next: NextFunction) => {
@@ -126,8 +127,11 @@ export const getContestantById = async (req: Request, res: Response, next: NextF
         const contestant = await Contestant.aggregate([
             {
                 $match: {
-                    _id: id
+                    "_id": new mongoose.Types.ObjectId(id)
                 }
+            },
+            {
+                $limit: 1
             },
             {
                 $lookup: {
@@ -194,8 +198,9 @@ export const getContestantById = async (req: Request, res: Response, next: NextF
                     },
                     createdAt:1,
                     updatedAt: 1,
-                },
-            }
+                },  
+            },
+            
         ])
 
         if(!contestant) {
@@ -204,7 +209,7 @@ export const getContestantById = async (req: Request, res: Response, next: NextF
 
         res.status(200).json({
             success: true,
-            data: contestant,
+            data: contestant[0],
             message: "Contestant fetched successfully"
         });
 
