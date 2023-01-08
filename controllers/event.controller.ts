@@ -117,5 +117,26 @@ const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 // DELETE
+const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const deletedEvent = await Event.findByIdAndUpdate(
+			req.params.id,
+			{
+				is_deleted: true,
+			},
+			{ new: true }
+		);
+
+		// remove is_deleted before sending to user
+		const { is_deleted, ...rest } = deletedEvent;
+		res.status(200).json({
+			success: true,
+			data: rest,
+			message: "Event deleted successfully",
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 
 export { getEvents, addEvent };
