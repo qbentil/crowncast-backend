@@ -84,10 +84,12 @@ export const getContestants = async (req: Request, res: Response, next: NextFunc
                     votes: 1,
                     status: 1,
                     category: {
-                        name: "$category.name",
+                        _id: "$category._id",
+                        title: "$category.title",
                         description: "$category.description",
                     },
                     event: {
+                        _id:"$event._id",
                         name: "$event.name",
                         description: "$event.description",
                         banner: "$event.banner",
@@ -178,10 +180,12 @@ export const getContestantById = async (req: Request, res: Response, next: NextF
                     votes: 1,
                     status: 1,
                     category: {
-                        name: "$category.name",
+                        _id: "$category._id",
+                        title: "$category.title",
                         description: "$category.description",
                     },
                     event: {
+                        _id: "$even._id",
                         name: "$event.name",
                         description: "$event.description",
                         banner: "$event.banner",
