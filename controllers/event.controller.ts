@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import Event from "../models/event.model";
 
 // CREATE EVENT
@@ -54,6 +55,7 @@ const getEvents = async (req: Request, res: Response, next: NextFunction) => {
 					description: 1,
 					banner: 1,
 					vote_price: 1,
+					votes: 1,
 					opening_date: 1,
 					closing_date: 1,
 					organizer: {
@@ -83,12 +85,53 @@ const getEventById = async (
 	res: Response,
 	next: NextFunction
 ) => {
+	const { id } = req.params;
+
 	try {
-		const event = await Event.findById(req.params.id);
-		const { is_deleted, ...rest } = event;
+		const event = await Event.aggregate([
+			{
+				$match: {
+					_id: new mongoose.Types.ObjectId(id),
+				},
+			},
+			{
+				$limit: 1,
+			},
+			{
+				$lookup: {
+					from: "organizers",
+					localField: "organizer",
+					foreignField: "_id",
+					as: "organizer",
+				},
+			},
+			{
+				$unwind: "$organizer",
+			},
+			{
+				$project: {
+					name: 1,
+					description: 1,
+					banner: 1,
+					vote_price: 1,
+					votes: 1,
+					opening_date: 1,
+					closing_date: 1,
+					organizer: {
+						name: "$organizer.name",
+						email: "$organizer.email",
+						phone: "$organizer.phone",
+						company: "$organizer.company",
+						address: "$organizer.address",
+					},
+				},
+			},
+		]);
+
 		res.status(200).json({
 			success: true,
-			data: rest,
+			data: event[0],
+			message: "Event fetched successfully",
 		});
 	} catch (err) {
 		next(err);
@@ -139,4 +182,4 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
 	}
 };
 
-export { getEvents, addEvent };
+export { getEvents, addEvent, getEventById, deleteEvent };
