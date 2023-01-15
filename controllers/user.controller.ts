@@ -35,8 +35,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         // remove password, is_deleted and token from user object
         const { password, is_deleted, token, ...rest } = user._doc;
 
-        // append access token to user object
+        // append access_token and usertype to user object
         rest.accessToken = accessToken;
+        rest.userType = "admin";
 
         res.status(200).json({
             success: true,
@@ -196,7 +197,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     try {
         const user = await User.findById(id);
-        if (!user || user.is_deleted || user.status !== "active" ) {
+        if (!user || user.is_deleted || user.status !== "active") {
             return next(CreateError(404, "User not found"));
         }
 

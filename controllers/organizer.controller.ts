@@ -35,8 +35,9 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         // remove password, is_deleted and token from organizer object
         const { password, is_deleted, token, ...rest } = organizer._doc;
 
-        // append access token to organizer object
+        // append access_token and usertype to organizer object
         rest.accessToken = accessToken;
+        rest.userType = "organizer";
 
         res.status(200).json({
             success: true,
@@ -236,10 +237,10 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     const { id } = req.params;
     try {
         const organizer = await Organizer.findById(id);
-                // check if organizer exists and is not deleted or inactive
-                if (!organizer || organizer.is_deleted || organizer.status === "inactive") {
-                    return next(CreateError(404, "Organizer not found"));
-                }
+        // check if organizer exists and is not deleted or inactive
+        if (!organizer || organizer.is_deleted || organizer.status === "inactive") {
+            return next(CreateError(404, "Organizer not found"));
+        }
         const { password, hashedPassword } = await GeneratePIN(8); // Generate a random 8 digit password and hash it
 
         await Organizer.findByIdAndUpdate(id, { password: hashedPassword });
@@ -256,7 +257,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
         next(err);
     }
 }
-    
+
 
 
 
