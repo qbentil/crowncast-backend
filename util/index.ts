@@ -94,3 +94,4 @@ export const GenerateContestantCode = (contestant: IContestantCode) => {
     return contestantCode;
     
 }
+

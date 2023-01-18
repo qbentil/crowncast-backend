@@ -60,7 +60,13 @@ export interface IOrganizer {
   status: String;
 }
 
-export interface ICategoryParam {
+export interface IFindCategoryParam {
   title: String;
   event: IEvent;
+}
+
+export interface ICreateCategoryParam {
+  title:String;
+  event :IEvent;
+  description :String;
 }
